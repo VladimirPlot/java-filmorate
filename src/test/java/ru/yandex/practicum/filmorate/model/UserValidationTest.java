@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -14,10 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserValidationTest {
 
     private Validator validator;
+    private static final Logger logger = LoggerFactory.getLogger(UserValidationTest.class);
 
     @BeforeEach
     public void setup() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        } catch (Exception e) {
+            logger.error("Ошибка при настройке валидатора: ", e);
+        }
     }
 
     @Test
@@ -59,7 +67,7 @@ public class UserValidationTest {
         User user = new User();
         user.setEmail("test@example.com");
         user.setLogin("userLogin");
-        user.setBirthday(LocalDate.now().plusDays(1));  // Future date
+        user.setBirthday(LocalDate.now().plusDays(1));
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty(), "Birthday should not be in the future");
@@ -72,7 +80,6 @@ public class UserValidationTest {
         user.setLogin("userLogin");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
-        // Name is null
         user.setName(null);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);

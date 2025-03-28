@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -14,10 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmValidationTest {
 
     private Validator validator;
+    private static final Logger logger = LoggerFactory.getLogger(FilmValidationTest.class);
 
     @BeforeEach
     public void setup() {
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        } catch (Exception e) {
+            logger.error("Ошибка при настройке валидатора: ", e);
+        }
     }
 
     @Test
@@ -74,7 +82,7 @@ public class FilmValidationTest {
         film.setName("Film");
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(-120);  // Negative duration
+        film.setDuration(-120);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty(), "Duration should be positive");
