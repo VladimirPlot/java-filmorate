@@ -1,24 +1,25 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/films")
+@RequestMapping("/users")
 @Slf4j
-public class FilmController {
-    private final List<Film> films = new ArrayList<>();
+public class UserController {
+    private final List<User> users = new ArrayList<>();
 
     @PostMapping
-    public Film createFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
+    public User createUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errors = new StringBuilder();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -27,13 +28,13 @@ public class FilmController {
             log.error("Ошибка валидации: {}", errors);
             throw new ValidationException(errors.toString());
         }
-        log.info("Создание фильма: {}", film);
-        films.add(film);
-        return film;
+        log.info("Создание пользователя: {}", user);
+        users.add(user);
+        return user;
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody @Valid Film film, BindingResult bindingResult) {
+    public User updateUser(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errors = new StringBuilder();
             for (FieldError error : bindingResult.getFieldErrors()) {
@@ -42,14 +43,14 @@ public class FilmController {
             log.error("Ошибка валидации: {}", errors);
             throw new ValidationException(errors.toString());
         }
-        log.info("Обновление фильма: {}", film);
-        films.add(film);
-        return film;
+        log.info("Обновление пользователя: {}", user);
+        users.add(user);
+        return user;
     }
 
     @GetMapping
-    public List<Film> getFilms() {
-        log.info("Получение списка всех фильмов");
-        return films;
+    public List<User> getUsers() {
+        log.info("Получение списка всех пользователей");
+        return users;
     }
 }
