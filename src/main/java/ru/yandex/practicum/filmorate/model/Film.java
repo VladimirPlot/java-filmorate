@@ -8,6 +8,9 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateValid;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -25,4 +28,19 @@ public class Film {
 
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
+
+    private Set<Integer> likes = new HashSet<>();
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Film film = (Film) obj;
+        return id == film.id && Objects.equals(name, film.name);
+    }
 }
