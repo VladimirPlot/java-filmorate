@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.EmailAlreadyTakenException;
 import ru.yandex.practicum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -12,12 +14,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     private boolean isEmailAlreadyTaken(String email) {
         return userStorage.getAllUsers().stream().anyMatch(user -> user.getEmail().equals(email));
@@ -47,6 +46,10 @@ public class UserService {
     }
 
     public Set<User> addFriend(int userId, int friendId) {
+        if (userId == friendId) {
+            throw new ValidationException("Нельзя добавить самого себя в друзья.");
+        }
+
         checkUserExistence(userId, "Пользователь");
         checkUserExistence(friendId, "Друг");
 
