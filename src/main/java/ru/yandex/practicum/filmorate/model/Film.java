@@ -31,6 +31,10 @@ public class Film {
 
     private Set<Integer> likes = new HashSet<>();
 
+    private MpaRating mpa;
+
+    private Set<Genre> genres = new HashSet<>();
+
     @Override
     public int hashCode() {
         return Objects.hash(id, name);

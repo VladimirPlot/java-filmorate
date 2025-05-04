@@ -29,6 +29,11 @@ public class UserController {
         return userService.getFriends(id);
     }
 
+    @GetMapping("/{id}/friends/requests")
+    public Set<User> getPendingFriendRequests(@PathVariable int id) {
+        return userService.getPendingFriendRequests(id);
+    }
+
     @GetMapping("/{id}/friends/common/{otherId}")
     public Set<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);

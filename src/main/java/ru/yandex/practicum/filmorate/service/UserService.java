@@ -2,47 +2,37 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.EmailAlreadyTakenException;
-import ru.yandex.practicum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-
-    private boolean isEmailAlreadyTaken(String email) {
-        return userStorage.getAllUsers().stream().anyMatch(user -> user.getEmail().equals(email));
-    }
-
-    private boolean isIdAlreadyTaken(int id) {
-        return userStorage.getAllUsers().stream().anyMatch(user -> user.getId() == id);
-    }
+    private final FriendshipStorage friendshipStorage;
 
     private void checkUserExistence(int userId, String role) {
-        Optional<User> user = userStorage.getUser(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(role + " с id " + userId + " не найден");
-        }
+        userStorage.getUser(userId)
+                .orElseThrow(() -> new UserNotFoundException(role + " с id " + userId + " не найден"));
     }
 
     public User addUser(User user) {
-        if (isEmailAlreadyTaken(user.getEmail())) {
-            throw new EmailAlreadyTakenException("Email уже занят");
-        }
-
-        if (isIdAlreadyTaken(user.getId())) {
-            throw new UserAlreadyExistsException("ID уже занят");
-        }
-
         return userStorage.addUser(user);
+    }
+
+    public User updateUser(User user) {
+        checkUserExistence(user.getId(), "Пользователь");
+        return userStorage.updateUser(user);
+    }
+
+    public List<User> getAllUsers() {
+        return userStorage.getAllUsers();
     }
 
     public Set<User> addFriend(int userId, int friendId) {
@@ -53,57 +43,48 @@ public class UserService {
         checkUserExistence(userId, "Пользователь");
         checkUserExistence(friendId, "Друг");
 
-        User user = userStorage.getUser(userId).get();
-        User friend = userStorage.getUser(friendId).get();
+        friendshipStorage.addFriend(userId, friendId);
 
-        user.getFriends().add(friend);
-        friend.getFriends().add(user);
-
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
-
-        return user.getFriends();
+        return getFriends(userId);
     }
 
     public Set<User> removeFriend(int userId, int friendId) {
         checkUserExistence(userId, "Пользователь");
         checkUserExistence(friendId, "Друг");
 
-        User user = userStorage.getUser(userId).get();
-        User friend = userStorage.getUser(friendId).get();
+        friendshipStorage.removeFriend(userId, friendId);
 
-        user.getFriends().remove(friend);
-        friend.getFriends().remove(user);
-
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
-
-        return user.getFriends();
+        return getFriends(userId);
     }
 
-    public User updateUser(User user) {
-        checkUserExistence(user.getId(), "Пользователь");
-
-        return userStorage.updateUser(user);
-    }
-
-    public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
-    }
-
-    public Set<User> getFriends(int id) {
-        checkUserExistence(id, "Пользователь");
-        return userStorage.getUser(id).get().getFriends();
+    public Set<User> getFriends(int userId) {
+        checkUserExistence(userId, "Пользователь");
+        return friendshipStorage.getFriends(userId).stream()
+                .map(id -> userStorage.getUser(id)
+                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден")))
+                .collect(Collectors.toSet());
     }
 
     public Set<User> getCommonFriends(int id, int otherId) {
         checkUserExistence(id, "Пользователь");
         checkUserExistence(otherId, "Пользователь");
 
-        Set<User> userFriends = userStorage.getUser(id).get().getFriends();
-        Set<User> otherUserFriends = userStorage.getUser(otherId).get().getFriends();
+        Set<Integer> commonFriendIds = friendshipStorage.getCommonFriends(id, otherId);
 
-        userFriends.retainAll(otherUserFriends);
-        return userFriends;
+        return commonFriendIds.stream()
+                .map(friendId -> userStorage.getUser(friendId)
+                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + friendId + " не найден")))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<User> getPendingFriendRequests(int userId) {
+        checkUserExistence(userId, "Пользователь");
+
+        Set<Integer> pendingIds = friendshipStorage.getPendingRequestsFor(userId);
+
+        return pendingIds.stream()
+                .map(id -> userStorage.getUser(id)
+                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден")))
+                .collect(Collectors.toSet());
     }
 }
