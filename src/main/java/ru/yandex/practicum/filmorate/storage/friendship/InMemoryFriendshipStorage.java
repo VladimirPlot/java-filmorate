@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFriendshipStorage implements FriendshipStorage {
 
-    // userId -> (friendId -> status)
     private final Map<Integer, Map<Integer, FriendshipStatus>> friendships = new HashMap<>();
 
     @Override
@@ -20,7 +19,6 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
 
         Map<Integer, FriendshipStatus> friendMap = friendships.getOrDefault(friendId, new HashMap<>());
         if (friendMap.get(userId) == FriendshipStatus.PENDING) {
-            // Подтверждаем дружбу с обеих сторон
             friendships.get(userId).put(friendId, FriendshipStatus.CONFIRMED);
             friendMap.put(userId, FriendshipStatus.CONFIRMED);
         }
@@ -38,9 +36,9 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
         if (friendFriends != null) {
             FriendshipStatus status = friendFriends.get(userId);
             if (status == FriendshipStatus.CONFIRMED) {
-                friendFriends.put(userId, FriendshipStatus.PENDING); // Один удалил — теперь снова просто запрос
+                friendFriends.put(userId, FriendshipStatus.PENDING);
             } else {
-                friendFriends.remove(userId); // Если была только заявка — удаляем полностью
+                friendFriends.remove(userId);
             }
         }
     }
@@ -73,7 +71,6 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
 
             FriendshipStatus statusToUser = relations.get(userId);
             if (statusToUser == FriendshipStatus.PENDING) {
-                // Проверим, что пользователь ещё не ответил или не подтвердил
                 Map<Integer, FriendshipStatus> userRelations = friendships.getOrDefault(userId, Collections.emptyMap());
                 if (userRelations.get(requesterId) != FriendshipStatus.CONFIRMED) {
                     pendingRequesters.add(requesterId);

@@ -60,6 +60,16 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleMpaNotFoundException(MpaNotFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleGenreNotFoundException(GenreNotFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     private ResponseEntity<ErrorResponse> buildResponse(String message, HttpStatus status) {
         return ResponseEntity.status(status).body(new ErrorResponse(message));
     }
