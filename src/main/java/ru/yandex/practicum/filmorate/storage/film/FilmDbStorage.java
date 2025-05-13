@@ -15,7 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-@Repository("filmDbStorage")
+@Repository
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 

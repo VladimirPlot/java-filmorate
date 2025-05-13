@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("userDbStorage")
+@Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 

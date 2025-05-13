@@ -26,19 +26,6 @@ public class GenreDbStorageTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    public void insertTestGenres() {
-        jdbcTemplate.update("""
-                    INSERT INTO genres (id, name) VALUES
-                    (1, 'Комедия'),
-                    (2, 'Драма'),
-                    (3, 'Мультфильм'),
-                    (4, 'Триллер'),
-                    (5, 'Документальный'),
-                    (6, 'Боевик')
-                """);
-    }
-
     @Test
     public void testGetGenreById() {
         Optional<Genre> genre = genreStorage.getGenreById(6);

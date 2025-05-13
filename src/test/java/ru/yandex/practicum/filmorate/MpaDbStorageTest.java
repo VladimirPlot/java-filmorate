@@ -26,11 +26,6 @@ public class MpaDbStorageTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    public void insertTestData() {
-        jdbcTemplate.update("INSERT INTO mpa_ratings (id, name) VALUES (1, 'G'), (2, 'PG')");
-    }
-
     @Test
     public void testGetMpaById() {
         Optional<MpaRating> mpa = mpaStorage.getMpaById(1);

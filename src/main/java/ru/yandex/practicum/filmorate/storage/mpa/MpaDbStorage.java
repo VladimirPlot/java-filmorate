@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import java.util.List;
 import java.util.Optional;
 
-@Repository("mpaDbStorage")
+@Repository
 @RequiredArgsConstructor
 public class MpaDbStorage implements MpaStorage {
 
