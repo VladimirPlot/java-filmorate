@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -12,10 +13,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
+
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
+
+    @Autowired
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage,
+                       @Qualifier("friendshipDbStorage") FriendshipStorage friendshipStorage) {
+        this.userStorage = userStorage;
+        this.friendshipStorage = friendshipStorage;
+    }
 
     private void checkUserExistence(int userId, String role) {
         userStorage.getUser(userId)
@@ -86,5 +94,10 @@ public class UserService {
                 .map(id -> userStorage.getUser(id)
                         .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден")))
                 .collect(Collectors.toSet());
+    }
+
+    public User getUserById(int id) {
+        return userStorage.getUser(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден"));
     }
 }
