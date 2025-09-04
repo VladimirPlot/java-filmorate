@@ -1,8 +1,92 @@
-# java-filmorate
-Template repository for Filmorate project.
-## 📊 ER-диаграмма базы данных
+# Filmorate
 
-![ER-диаграмма Filmorate](docs/er-diagram.png)
+Сервис для учёта фильмов и пользовательских оценок/лайков: хранит фильмы, пользователей, жанры и рейтинг MPA, позволяет ставить лайки и формировать подборки популярных фильмов.
+
+📌 Учебный проект Яндекс Практикума (Java-разработчик, 2025).
+
+---
+
+## 🚀 Функционал
+- CRUD для фильмов и пользователей  
+- Лайки к фильмам, список популярных фильмов  
+- Друзья/подписки между пользователями (двусторонняя дружба)  
+- Жанры и рейтинг MPA у фильмов  
+- (Опционально) Режиссёры, отзывы и рекомендации
+
+---
+
+## 🛠️ Стек технологий
+- Java 17  
+- Spring Boot (Web, Data JPA/Validation, Lombok)  
+- PostgreSQL / H2 (тесты)  
+- Maven  
+- JUnit 5, Mockito  
+- Docker (опционально)
+
+---
+
+## ▶️ Запуск
+
+### Вариант 1. Локально
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+### Вариант 2. Docker (если есть docker-compose)
+```bash
+docker compose up --build
+```
+
+---
+
+## 🧪 Тесты
+```bash
+mvn test
+```
+Интеграционные тесты используют H2, покрывают сервисы и репозитории.
+
+---
+
+## 📚 Основные эндпоинты (пример)
+### Films
+
+POST /films — создать фильм
+
+PUT /films — обновить фильм
+
+GET /films/{id} — получить фильм
+
+GET /films — список фильмов
+
+PUT /films/{id}/like/{userId} — поставить лайк
+
+DELETE /films/{id}/like/{userId} — убрать лайк
+
+GET /films/popular?count=10 — популярные фильмы
+
+### Users
+
+POST /users — создать пользователя
+
+PUT /users — обновить пользователя
+
+GET /users/{id} — получить пользователя
+
+GET /users — список пользователей
+
+PUT /users/{id}/friends/{friendId} — добавить в друзья
+
+DELETE /users/{id}/friends/{friendId} — удалить из друзей
+
+GET /users/{id}/friends — друзья пользователя
+
+GET /users/{id}/friends/common/{otherId} — общие друзья
+
+---
+
+📈 ER-диаграмма
+
+Смотри изображение в docs/er-filmorate.png (или вставь Mermaid/dbdiagram код ниже).
 
 ## 📄 Примеры SQL-запросов
 
