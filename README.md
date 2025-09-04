@@ -84,9 +84,11 @@ GET /users/{id}/friends/common/{otherId} — общие друзья
 
 ---
 
-📈 ER-диаграмма
+## 📈 ER-диаграмма
 
-Смотри изображение в docs/er-filmorate.png (или вставь Mermaid/dbdiagram код ниже).
+![ER Filmorate](./docs/er-diagram.png) 
+
+---
 
 ## 📄 Примеры SQL-запросов
 
